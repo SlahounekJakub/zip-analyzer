@@ -128,6 +128,12 @@ if st.sidebar.button("Analyze ZIP"):
                     color="red",
                     label="kritická zóna",
                     zorder=5
+                    critical_t = detect_critical_zones(np.abs(C_time), C_space)
+
+                ax[2].scatter(
+                    np.where(critical_t)[0],
+                    C_st[critical_t],
+                    color="red"
 )
                 ax[2].legend()
                 ax[2].set_title("ZIP koherence + kritické zóny")
