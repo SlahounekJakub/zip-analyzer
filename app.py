@@ -119,14 +119,14 @@ if st.sidebar.button("Analyze ZIP"):
             ax[2].plot(C, label="ZIP koherence")
             idx = np.where(critical)[0]
 
-if idx.size > 0 and idx.max() < C.shape[0]:
-    ax[2].scatter(
-        idx,
-        C[idx],
-        color="red",
-        s=20,
-        zorder=5,
-        label="kritická zóna"
+        if idx.size > 0 and idx.max() < C.shape[0]:
+            ax[2].scatter(
+            idx,
+            C[idx],
+            color="red",
+            s=20,
+            zorder=5,
+            label="kritická zóna"
     )
             ax[2].legend()
             ax[2].set_title("ZIP koherence + kritické zóny")
