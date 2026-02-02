@@ -27,7 +27,18 @@ def zip_analyzer(phi, dx=1.0):
 
     return E, grad_mag, C_zip
 
+def zip_time_coherence(phi_t, phi_t1, dt=1.0):
+    """
+    Časová ZIP koherence mezi dvěma po sobě jdoucími časovými řezy
+    """
+    dphi = (phi_t1 - phi_t) / dt
 
+    # ochrana proti nulám
+    denom = np.abs(dphi) * np.abs(np.roll(dphi, -1)) + 1e-12
+    C_time = np.abs(dphi * np.roll(dphi, -1)) / denom
+
+    return C_time
+    
 # =====================
 # STREAMLIT UI
 # =====================
