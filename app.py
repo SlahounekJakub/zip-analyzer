@@ -9,15 +9,21 @@ def zip_analyzer(phi, dx=1.0):
     grad = np.gradient(phi, dx)
     grad_mag = np.sqrt(sum(g**2 for g in grad))
 
-    # Rozlišení dimenze
+    shifted_grad = []
+
     if phi.ndim == 1:
-        # 1D posun
-        shifted_grad = [np.roll(g, 1) for g in grad]
+        # 1D: jen jedna osa
+        shifted_grad.append(np.roll(grad[0], 1))
+
+    elif phi.ndim == 2:
+        # 2D: každý gradient posunout po své ose
+        # grad[0] = d/dy → osa 0
+        # grad[1] = d/dx → osa 1
+        shifted_grad.append(np.roll(grad[0], 1, axis=0))
+        shifted_grad.append(np.roll(grad[1], 1, axis=1))
+
     else:
-        # 2D posun po obou osách
-        shifted_grad = [
-            np.roll(g, 1, axis=0) for g in grad
-        ]
+        raise ValueError("ZIP Analyzer podporuje jen 1D a 2D data.")
 
     dot = sum(g * sg for g, sg in zip(grad, shifted_grad))
     shifted_mag = np.sqrt(sum(sg**2 for sg in shifted_grad))
