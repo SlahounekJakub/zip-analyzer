@@ -86,10 +86,21 @@ if st.sidebar.button("Analyze ZIP"):
             
             # output
             if dimension == "1D":
-                st.subheader("Výsledky 1D:")
-                st.line_chart(E)
-                st.line_chart(I)
-                st.line_chart(C)
+    st.subheader("Výsledky 1D:")
+
+    fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
+
+    ax[0].plot(np.asarray(E).flatten())
+    ax[0].set_title("Energie")
+
+    ax[1].plot(np.asarray(I).flatten())
+    ax[1].set_title("In-formace")
+
+    ax[2].plot(np.asarray(C).flatten())
+    ax[2].set_title("ZIP koherence")
+
+    plt.tight_layout()
+    st.pyplot(fig)
             else:
                 st.subheader("Výsledky 2D (heatmapy):")
                 col1, col2, col3 = st.columns(3)
