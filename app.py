@@ -159,23 +159,7 @@ if st.sidebar.button("Analyze ZIP"):
             ax[2].set_title("ZIP – prostor × čas")
 
             plt.tight_layout()
-            st.pyplot(fig)
-            else:
-                col1, col2, col3 = st.columns(3)
-
-                def show(data, title):
-                    fig, ax = plt.subplots()
-                    im = ax.imshow(data, origin="lower", cmap="inferno")
-                    ax.set_title(title)
-                    plt.colorbar(im, ax=ax)
-                    st.pyplot(fig)
-
-                with col1:
-                    show(E, "Energie")
-                with col2:
-                    show(I, "In-formace")
-                with col3:
-                    show(C, "ZIP koherence")
+            st.pyplot(fig) 
 
     elif analysis_mode == "Časový ZIP":
         st.subheader("ZIP – časová analýza (demo)")
