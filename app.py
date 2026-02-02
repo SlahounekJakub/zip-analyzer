@@ -26,6 +26,7 @@ def zip_analyzer(phi, dx=1.0):
     E = np.abs(phi)**2
 
     return E, grad_mag, C_zip
+    
 # =====================
 # STREAMLIT UI
 # =====================
