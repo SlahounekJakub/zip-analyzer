@@ -9,7 +9,16 @@ def zip_analyzer(phi, dx=1.0):
     grad = np.gradient(phi, dx)
     grad_mag = np.sqrt(sum(g**2 for g in grad))
 
-    shifted_grad = [np.roll(g, 1, axis=0) for g in grad]
+    # Rozlišení dimenze
+    if phi.ndim == 1:
+        # 1D posun
+        shifted_grad = [np.roll(g, 1) for g in grad]
+    else:
+        # 2D posun po obou osách
+        shifted_grad = [
+            np.roll(g, 1, axis=0) for g in grad
+        ]
+
     dot = sum(g * sg for g, sg in zip(grad, shifted_grad))
     shifted_mag = np.sqrt(sum(sg**2 for sg in shifted_grad))
 
@@ -17,7 +26,6 @@ def zip_analyzer(phi, dx=1.0):
     E = np.abs(phi)**2
 
     return E, grad_mag, C_zip
-
 # =====================
 # STREAMLIT UI
 # =====================
