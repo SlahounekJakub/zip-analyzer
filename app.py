@@ -156,5 +156,12 @@ if st.sidebar.button("Analyze ZIP"):
                 ax[0].plot(C_space)
                 ax[0].set_title("ZIP – prostorová koherence")
 
+       
                 ax[1].plot(C_time)
-                ax
+ax[1].set_title("ZIP – časová koherence")
+
+ax[2].plot(C_st)
+ax[2].set_title("ZIP – prostor × čas")
+
+plt.tight_layout()
+st.pyplot(fig)
