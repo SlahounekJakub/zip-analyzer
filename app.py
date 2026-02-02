@@ -86,56 +86,17 @@ else:
 # =====================
 
 if st.sidebar.button("Analyze ZIP"):
-st.write("DATA SHAPE:", phi.shape)
-    if analysis_mode == "Statický ZIP":
-        if phi is None:
-            st.warning("Nejsou dostupná data.")
-        else:
+
+    if phi is None:
+        st.warning("Nejsou dostupná data.")
+    else:
+        st.write("DATA SHAPE:", phi.shape)
+
+        if analysis_mode == "Statický ZIP":
             E, I, C = zip_analyzer(phi, dx)
-            
-# ===== KROK 2: ROZHODNUTÍ PODLE DIMENZE =====
 
-        if dimension == "1D":
-            fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
-
-            ax[0].plot(E)
-            ax[0].set_title("Energie")
-
-            ax[1].plot(I)
-            ax[1].set_title("In-formace")
-
-            critical = detect_critical_zones(E, C)
-
-            ax[2].plot(C)
-            ax[2].scatter(
-                np.where(critical)[0],
-                C[critical],
-                color="red"
-            )
-            ax[2].set_title("ZIP koherence")
-
-            plt.tight_layout()
-            st.pyplot(fig)
-
-        elif dimension == "2D":
-            col1, col2, col3 = st.columns(3)
-
-            def show(data, title):
-                fig, ax = plt.subplots()
-                im = ax.imshow(data, origin="lower", cmap="inferno")
-                ax.set_title(title)
-                plt.colorbar(im, ax=ax)
-                st.pyplot(fig)
-
-            with col1:
-                show(E, "Energie")
-            with col2:
-                show(I, "In-formace")
-            with col3:
-                show(C, "ZIP koherence")
+            # ===== KROK 2: ROZHODNUTÍ PODLE DIMENZE =====
             if dimension == "1D":
-                critical = detect_critical_zones(E, C)
-
                 fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
                 ax[0].plot(E)
@@ -144,20 +105,61 @@ st.write("DATA SHAPE:", phi.shape)
                 ax[1].plot(I)
                 ax[1].set_title("In-formace")
 
-                ax[2].plot(C, label="ZIP koherence")
+                critical = detect_critical_zones(E, C)
+
+                ax[2].plot(C)
                 ax[2].scatter(
                     np.where(critical)[0],
                     C[critical],
-                    color="red",
-                    label="kritická zóna",
-                    zorder=5
+                    color="red"
                 )
-                ax[2].legend()
-                ax[2].set_title("ZIP koherence + kritické zóny")
+                ax[2].set_title("ZIP koherence")
 
                 plt.tight_layout()
                 st.pyplot(fig)
 
+            elif dimension == "2D":
+                col1, col2, col3 = st.columns(3)
+
+                def show(data, title):
+                    fig, ax = plt.subplots()
+                    im = ax.imshow(data, origin="lower", cmap="inferno")
+                    ax.set_title(title)
+                    plt.colorbar(im, ax=ax)
+                    st.pyplot(fig)
+
+                with col1:
+                    show(E, "Energie")
+                with col2:
+                    show(I, "In-formace")
+                with col3:
+                    show(C, "ZIP koherence")
+
+        elif analysis_mode == "Časový ZIP":
+            st.subheader("ZIP – časová analýza (demo)")
+
+            phi_time = demo_time_data_1d()
+            T = phi_time.shape[0]
+
+            t = st.slider("Časový krok", 0, T - 2, 0)
+
+            E, I, C_space = zip_analyzer(phi_time[t], dx)
+            C_time = zip_time_coherence(phi_time[t], phi_time[t + 1])
+            C_st = C_space * C_time
+
+            fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
+
+            ax[0].plot(C_space)
+            ax[0].set_title("ZIP – prostorová koherence")
+
+            ax[1].plot(C_time)
+            ax[1].set_title("ZIP – časová koherence")
+
+            ax[2].plot(C_st)
+            ax[2].set_title("ZIP – prostor × čas")
+
+            plt.tight_layout()
+            st.pyplot(fig)
             else:
                 col1, col2, col3 = st.columns(3)
 
