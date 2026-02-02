@@ -129,8 +129,8 @@ if st.sidebar.button("Analyze ZIP"):
                     label="kritická zóna",
                     zorder=5
 )
-ax[2].legend()
-ax[2].set_title("ZIP koherence + kritické zóny")
+                ax[2].legend()
+                ax[2].set_title("ZIP koherence + kritické zóny")
 
                 plt.tight_layout()
                 st.pyplot(fig)
