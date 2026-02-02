@@ -38,6 +38,15 @@ def zip_time_coherence(phi_t, phi_t1, dt=1.0):
     C_time = np.abs(dphi * np.roll(dphi, -1)) / denom
 
     return C_time
+
+def demo_time_data_1d(T=30, N=300):
+    x = np.linspace(-10, 10, N)
+    data = []
+    for t in range(T):
+        phi = np.sin(x + 0.2*t) * np.exp(-0.1*(x - 0.05*t)**2)
+        data.append(phi)
+    return np.array(data)
+    
     
 # =====================
 # STREAMLIT UI
