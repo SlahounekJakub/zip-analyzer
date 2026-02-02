@@ -60,6 +60,10 @@ st.sidebar.header("Vstupní nastavení")
 
 mode = st.sidebar.radio("Zdroj dat:", ["Demo data", "Upload CSV"])
 dimension = st.sidebar.radio("Dimenze dat:", ["1D", "2D"])
+analysis_mode = st.sidebar.radio(
+    "Režim analýzy:",
+    ["Statický ZIP", "Časový ZIP"]
+)
 dx = st.sidebar.slider("dx (měřítko):", 0.1, 5.0, 1.0)
 
 phi = None
