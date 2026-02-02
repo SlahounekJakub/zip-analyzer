@@ -85,7 +85,7 @@ if st.sidebar.button("Analyze ZIP"):
             E, I, C = zip_analyzer(phi, dx)
             
             # output
-            if dimension == "1D:"
+            if dimension == "1D":
     st.subheader("Výsledky 1D:")
 
     fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
