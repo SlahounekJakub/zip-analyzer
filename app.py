@@ -132,7 +132,7 @@ if st.sidebar.button("Analyze ZIP"):
             plt.tight_layout()
             st.pyplot(fig)
 
-        else:  # 2D
+        elif dimension == "2D":
             col1, col2, col3 = st.columns(3)
 
             def show(data, title):
