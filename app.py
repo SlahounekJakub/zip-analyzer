@@ -26,7 +26,17 @@ def zip_analyzer(phi, dx=1.0):
     E = np.abs(phi)**2
 
     return E, grad_mag, C_zip
-
+    
+def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
+    """
+    Kritické zóny:
+    - energie nad prahem
+    - ZIP koherence pod prahem
+    """
+    E_norm = (E - np.min(E)) / (np.max(E) - np.min(E) + 1e-12)
+    critical = (E_norm > e_thr) & (C < c_thr)
+    return critical
+    
 def demo_time_data_1d(T=30, N=300):
     x = np.linspace(-10, 10, N)
     data = []
