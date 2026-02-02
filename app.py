@@ -36,9 +36,8 @@ def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
     if E.shape != C.shape:
         return np.zeros_like(E, dtype=bool)
 
-    E_norm = (E - np.nanmin(E)) / (np.nanmax(E) - np.nanmin(E) + 1e-12)
-    critical = (E_norm > e_thr) & (C < c_thr)
-    return critical.astype(bool)
+    E_norm = (E - np.min(E)) / (np.max(E) - np.min(E) + 1e-12)
+    return (E_norm > e_thr) & (C < c_thr)
 
 
 def zip_time_coherence(phi_t, phi_t1, dt=1.0):
@@ -119,22 +118,23 @@ if st.sidebar.button("Analyze ZIP"):
             ax[2].plot(C, label="ZIP koherence")
             idx = np.where(critical)[0]
 
-        if idx.size > 0 and idx.max() < C.shape[0]:
-            ax[2].scatter(
-            idx,
-            C[idx],
-            color="red",
-            s=20,
-            zorder=5,
-            label="kritická zóna"
-    )
+            if idx.size > 0:
+                ax[2].scatter(
+                    idx,
+                    C[idx],
+                    color="red",
+                    s=20,
+                    zorder=5,
+                    label="kritická zóna"
+                )
+
             ax[2].legend()
             ax[2].set_title("ZIP koherence + kritické zóny")
 
             plt.tight_layout()
             st.pyplot(fig)
 
-        elif dimension == "2D":
+        else:  # 2D
             col1, col2, col3 = st.columns(3)
 
             def show(data, title):
