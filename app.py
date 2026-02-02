@@ -165,3 +165,5 @@ ax[2].set_title("ZIP – prostor × čas")
 
 plt.tight_layout()
 st.pyplot(fig)
+except Exception as e:
+            st.error(f"ZIP analýza selhala: {e}")
