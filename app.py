@@ -119,8 +119,18 @@ if st.sidebar.button("Analyze ZIP"):
                 ax[1].plot(I)
                 ax[1].set_title("In-formace")
 
-                ax[2].plot(C)
-                ax[2].set_title("ZIP koherence")
+                critical = detect_critical_zones(E, C)
+
+                ax[2].plot(C, label="ZIP koherence")
+                ax[2].scatter(
+                    np.where(critical)[0],
+                    C[critical],
+                    color="red",
+                    label="kritická zóna",
+                    zorder=5
+)
+ax[2].legend()
+ax[2].set_title("ZIP koherence + kritické zóny")
 
                 plt.tight_layout()
                 st.pyplot(fig)
