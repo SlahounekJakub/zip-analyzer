@@ -95,76 +95,71 @@ if st.sidebar.button("Analyze ZIP"):
     if phi is None:
         st.warning("Nejsou dostupná data.")
     else:
-        try:
-            if analysis_mode == "Statický ZIP":
-                E, I, C = zip_analyzer(phi, dx)
+        if analysis_mode == "Statický ZIP":
+            E, I, C = zip_analyzer(phi, dx)
 
-                if dimension == "1D":
-                    st.subheader("Výsledky 1D")
-
-                    fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
-
-                    ax[0].plot(E)
-                    ax[0].set_title("Energie")
-
-                    ax[1].plot(I)
-                    ax[1].set_title("In-formace")
-
-                    ax[2].plot(C)
-                    ax[2].set_title("ZIP koherence")
-
-                    plt.tight_layout()
-                    st.pyplot(fig)
-
-                else:
-                    st.subheader("Výsledky 2D")
-
-                    col1, col2, col3 = st.columns(3)
-
-                    def show(data, title):
-                        fig, ax = plt.subplots()
-                        im = ax.imshow(data, origin="lower", cmap="inferno")
-                        ax.set_title(title)
-                        plt.colorbar(im, ax=ax)
-                        st.pyplot(fig)
-
-                    with col1:
-                        show(E, "Energie")
-                    with col2:
-                        show(I, "In-formace")
-                    with col3:
-                        show(C, "ZIP koherence")
-
-            elif analysis_mode == "Časový ZIP":
-                st.subheader("ZIP – časová analýza (demo)")
-
-                phi_time = demo_time_data_1d()
-                T = phi_time.shape[0]
-
-                t_index = st.slider("Časový krok", 0, T - 2, 0)
-
-                E, I, C_space = zip_analyzer(phi_time[t_index], dx)
-                C_time = zip_time_coherence(
-                    phi_time[t_index],
-                    phi_time[t_index + 1]
-                )
-
-                C_st = C_space * C_time
+            if dimension == "1D":
+                st.subheader("Výsledky 1D")
 
                 fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
-                ax[0].plot(C_space)
-                ax[0].set_title("ZIP – prostorová koherence")
+                ax[0].plot(E)
+                ax[0].set_title("Energie")
 
-       
-                ax[1].plot(C_time)
-ax[1].set_title("ZIP – časová koherence")
+                ax[1].plot(I)
+                ax[1].set_title("In-formace")
 
-ax[2].plot(C_st)
-ax[2].set_title("ZIP – prostor × čas")
+                ax[2].plot(C)
+                ax[2].set_title("ZIP koherence")
 
-plt.tight_layout()
+                plt.tight_layout()
                 st.pyplot(fig)
 
-        except Exception as e:
-            st.error(f"ZIP analýza selhala: {e}")
+            else:
+                st.subheader("Výsledky 2D")
+
+                col1, col2, col3 = st.columns(3)
+
+                def show(data, title):
+                    fig, ax = plt.subplots()
+                    im = ax.imshow(data, origin="lower", cmap="inferno")
+                    ax.set_title(title)
+                    plt.colorbar(im, ax=ax)
+                    st.pyplot(fig)
+
+                with col1:
+                    show(E, "Energie")
+                with col2:
+                    show(I, "In-formace")
+                with col3:
+                    show(C, "ZIP koherence")
+
+        elif analysis_mode == "Časový ZIP":
+            st.subheader("ZIP – časová analýza (demo)")
+
+            phi_time = demo_time_data_1d()
+            T = phi_time.shape[0]
+
+            t_index = st.slider("Časový krok", 0, T - 2, 0)
+
+            E, I, C_space = zip_analyzer(phi_time[t_index], dx)
+            C_time = zip_time_coherence(
+                phi_time[t_index],
+                phi_time[t_index + 1]
+            )
+
+            C_st = C_space * C_time
+
+            fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
+
+            ax[0].plot(C_space)
+            ax[0].set_title("ZIP – prostorová koherence")
+
+            ax[1].plot(C_time)
+            ax[1].set_title("ZIP – časová koherence")
+
+            ax[2].plot(C_st)
+            ax[2].set_title("ZIP – prostor × čas")
+
+            plt.tight_layout()
+            st.pyplot(fig)
