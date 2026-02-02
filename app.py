@@ -27,6 +27,14 @@ def zip_analyzer(phi, dx=1.0):
 
     return E, grad_mag, C_zip
 
+def demo_time_data_1d(T=30, N=300):
+    x = np.linspace(-10, 10, N)
+    data = []
+    for t in range(T):
+        phi = np.sin(x + 0.2*t) * np.exp(-0.1*(x - 0.05*t)**2)
+        data.append(phi)
+    return np.array(data)
+    
 def zip_time_coherence(phi_t, phi_t1, dt=1.0):
     """
     Časová ZIP koherence mezi dvěma po sobě jdoucími časovými řezy
@@ -39,14 +47,7 @@ def zip_time_coherence(phi_t, phi_t1, dt=1.0):
 
     return C_time
 
-def demo_time_data_1d(T=30, N=300):
-    x = np.linspace(-10, 10, N)
-    data = []
-    for t in range(T):
-        phi = np.sin(x + 0.2*t) * np.exp(-0.1*(x - 0.05*t)**2)
-        data.append(phi)
-    return np.array(data)
-    
+
     
 # =====================
 # STREAMLIT UI
