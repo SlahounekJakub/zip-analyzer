@@ -85,22 +85,47 @@ if st.sidebar.button("Analyze ZIP"):
             E, I, C = zip_analyzer(phi, dx)
             
             # output
-            if dimension == "1D":
-    st.subheader("Výsledky 1D:")
+            if st.sidebar.button("Analyze ZIP"):
+    if phi is None:
+        st.warning("Nejprve zvol data.")
+    else:
+        E, I, C = zip_analyzer(phi, dx)
 
-    fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
+        if dimension == "1D":
+            st.subheader("Výsledky 1D")
 
-    ax[0].plot(np.asarray(E).flatten())
-    ax[0].set_title("Energie")
+            fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
-    ax[1].plot(np.asarray(I).flatten())
-    ax[1].set_title("In-formace")
+            ax[0].plot(np.asarray(E).flatten())
+            ax[0].set_title("Energie")
 
-    ax[2].plot(np.asarray(C).flatten())
-    ax[2].set_title("ZIP koherence")
+            ax[1].plot(np.asarray(I).flatten())
+            ax[1].set_title("In-formace")
 
-    plt.tight_layout()
-    st.pyplot(fig)
+            ax[2].plot(np.asarray(C).flatten())
+            ax[2].set_title("ZIP koherence")
+
+            plt.tight_layout()
+            st.pyplot(fig)
+
+        else:
+            st.subheader("Výsledky 2D")
+
+            col1, col2, col3 = st.columns(3)
+
+            def show(data, title):
+                fig, ax = plt.subplots()
+                im = ax.imshow(data, origin="lower", cmap="inferno")
+                ax.set_title(title)
+                plt.colorbar(im, ax=ax)
+                st.pyplot(fig)
+
+            with col1:
+                show(E, "Energie")
+            with col2:
+                show(I, "In-formace")
+            with col3:
+                show(C, "ZIP koherence")
             else:
                 st.subheader("Výsledky 2D (heatmapy):")
                 col1, col2, col3 = st.columns(3)
