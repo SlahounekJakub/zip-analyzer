@@ -128,6 +128,7 @@ if st.sidebar.button("Analyze ZIP"):
                     color="red",
                     label="kritická zóna",
                     zorder=5
+)
                     critical_t = detect_critical_zones(np.abs(C_time), C_space)
 
                 ax[2].scatter(
