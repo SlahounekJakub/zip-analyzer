@@ -6,6 +6,13 @@ import matplotlib.pyplot as plt
 # ZIP CORE
 # =====================
 
+ZIP_SHIFTS_2D = [
+    (0, 1),   # x směr
+    (1, 0),   # y směr
+    (1, 1),   # diagonála
+    (1, -1)   # druhá diagonála
+]
+
 def zip_analyzer(phi, dx=1.0):
     grad = np.gradient(phi, dx)
     grad_mag = np.sqrt(sum(g**2 for g in grad))
