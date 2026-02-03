@@ -27,7 +27,37 @@ def zip_analyzer(phi, dx=1.0):
     E = np.abs(phi) ** 2
 
     return E, grad_mag, C
+def zip_analyzer_2d(phi, dx=1.0, shift=(1, 0)):
+    """
+    2D ZIP coherence for scalar field phi(x,y)
 
+    shift = (dy, dx) direction of comparison
+    """
+    # gradient
+    gy, gx = np.gradient(phi, dx)
+
+    # gradient magnitude
+    grad_mag = np.sqrt(gx**2 + gy**2)
+
+    # shifted gradients
+    gy_s = np.roll(gy, shift[0], axis=0)
+    gx_s = np.roll(gx, shift[1], axis=1)
+
+    grad_mag_s = np.sqrt(gx_s**2 + gy_s**2)
+
+    # dot product
+    dot = gx * gx_s + gy * gy_s
+
+    # ZIP coherence
+    C = np.abs(dot) / (grad_mag * grad_mag_s + 1e-12)
+
+    # energy
+    E = phi**2
+
+    # information intensity
+    I = grad_mag
+
+    return E, I, C
 
 def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
     E = np.asarray(E)
