@@ -34,6 +34,7 @@ def zip_analyzer(phi, dx=1.0):
     E = np.abs(phi) ** 2
 
     return E, grad_mag, C
+    
 def zip_analyzer_2d(phi, dx=1.0, shift=(1, 0)):
     """
     2D ZIP coherence for scalar field phi(x,y)
@@ -65,7 +66,14 @@ def zip_analyzer_2d(phi, dx=1.0, shift=(1, 0)):
     I = grad_mag
 
     return E, I, C
-
+    
+def zip_2d_isotropic(phi, dx=1.0):
+    Cs = []
+    for shift in ZIP_SHIFTS_2D:
+        _, _, C = zip_analyzer_2d(phi, dx, shift)
+        Cs.append(C)
+    return np.mean(Cs, axis=0)
+    
 def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
     E = np.asarray(E)
     C = np.asarray(C)
