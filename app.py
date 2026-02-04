@@ -189,7 +189,14 @@ elif zii >= 0.4:
 else:
     st.error("Systém je silně anizotropní.")
 
-        _, _, C_spatial = zip_analyzer(phi_t[t], dx)
+# =====================
+# ZIP – časová analýza
+# =====================
+
+phi_t = demo_time_data_1d()
+t = st.slider("Časový krok", 0, phi_t.shape[0] - 2, 0)
+
+_, _, C_spatial = zip_analyzer(phi_t[t], dx)
 C_temporal = zip_time_coherence(phi_t[t], phi_t[t+1])
 C_spacetime = C_spatial * C_temporal
 
