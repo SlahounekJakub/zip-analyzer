@@ -2,123 +2,67 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
-# =====================
+# ==================================================
 # ZIP CORE
-# =====================
+# ==================================================
 
 ZIP_SHIFTS_2D = [
-    (0, 1),   # x směr
-    (1, 0),   # y směr
-    (1, 1),   # diagonála
-    (1, -1)   # druhá diagonála
+    (0, 1),
+    (1, 0),
+    (1, 1),
+    (1, -1)
 ]
 
-def zip_analyzer(phi, dx=1.0):
-    grad = np.gradient(phi, dx)
-    grad_mag = np.sqrt(sum(g**2 for g in grad))
+def zip_analyzer_1d(phi, dx=1.0):
+    g = np.gradient(phi, dx)
+    g_shift = np.roll(g, 1)
 
-    if phi.ndim == 1:
-        shifted_grad = [np.roll(grad[0], 1)]
-    elif phi.ndim == 2:
-        shifted_grad = [
-            np.roll(grad[0], 1, axis=0),
-            np.roll(grad[1], 1, axis=1)
-        ]
-    else:
-        raise ValueError("Podporována jsou pouze 1D a 2D data.")
-
-    dot = sum(g * sg for g, sg in zip(grad, shifted_grad))
-    shifted_mag = np.sqrt(sum(sg**2 for sg in shifted_grad))
-
-    C = np.abs(dot) / (grad_mag * shifted_mag + 1e-12)
-    E = np.abs(phi) ** 2
-
-    return E, grad_mag, C
-    
-def zip_analyzer_2d(phi, dx=1.0, shift=(1, 0)):
-    """
-    2D ZIP coherence for scalar field phi(x,y)
-
-    shift = (dy, dx) direction of comparison
-    """
-    # gradient
-    gy, gx = np.gradient(phi, dx)
-
-    # gradient magnitude
-    grad_mag = np.sqrt(gx**2 + gy**2)
-
-    # shifted gradients
-    gy_s = np.roll(gy, shift[0], axis=0)
-    gx_s = np.roll(gx, shift[1], axis=1)
-
-    grad_mag_s = np.sqrt(gx_s**2 + gy_s**2)
-
-    # dot product
-    dot = gx * gx_s + gy * gy_s
-
-    # ZIP coherence
-    C = np.abs(dot) / (grad_mag * grad_mag_s + 1e-12)
-
-    # energy
     E = phi**2
-
-    # information intensity
-    I = grad_mag
+    I = np.abs(g)
+    C = np.abs(g * g_shift) / (np.abs(g) * np.abs(g_shift) + 1e-12)
 
     return E, I, C
-    
+
+
+def zip_analyzer_2d(phi, dx=1.0, shift=(1, 0)):
+    gy, gx = np.gradient(phi, dx)
+
+    gx_s = np.roll(gx, shift[1], axis=1)
+    gy_s = np.roll(gy, shift[0], axis=0)
+
+    dot = gx * gx_s + gy * gy_s
+    mag = np.sqrt(gx**2 + gy**2)
+    mag_s = np.sqrt(gx_s**2 + gy_s**2)
+
+    C = np.abs(dot) / (mag * mag_s + 1e-12)
+    E = phi**2
+    I = mag
+
+    return E, I, C
+
+
 def zip_2d_isotropic(phi, dx=1.0):
     Cs = []
-    for shift in ZIP_SHIFTS_2D:
-        _, _, C = zip_analyzer_2d(phi, dx, shift)
+    for s in ZIP_SHIFTS_2D:
+        _, _, C = zip_analyzer_2d(phi, dx, s)
         Cs.append(C)
     return np.mean(Cs, axis=0)
-    
+
+
 def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
-    E = np.asarray(E)
-    C = np.asarray(C)
-
-    if E.shape != C.shape:
-        return np.zeros_like(E, dtype=bool)
-
-    E_norm = (E - np.min(E)) / (np.max(E) - np.min(E) + 1e-12)
-    return (E_norm > e_thr) & (C < c_thr)
+    En = (E - E.min()) / (E.max() - E.min() + 1e-12)
+    return (En > e_thr) & (C < c_thr)
 
 
-def zip_time_coherence(phi_t, phi_t1, dt=1.0):
-    dphi = (phi_t1 - phi_t) / dt
-    denom = np.abs(dphi) * np.abs(np.roll(dphi, -1)) + 1e-12
-    return np.abs(dphi * np.roll(dphi, -1)) / denom
+def zip_time_coherence(phi_t, phi_t1):
+    d = phi_t1 - phi_t
+    d_s = np.roll(d, 1)
+    return np.abs(d * d_s) / (np.abs(d) * np.abs(d_s) + 1e-12)
 
 
-def demo_time_data_1d(T=30, N=300):
-    x = np.linspace(-10, 10, N)
-    return np.array([
-        np.sin(x + 0.2 * t) * np.exp(-0.1 * (x - 0.05 * t) ** 2)
-        for t in range(T)
-    ])
-def zip_health_index(C, threshold=0.5):
-    """
-    ZIP Health Index (ZHI)
-    Fraction of spatial domain with ZIP coherence above threshold.
-    """
-    C = np.asarray(C)
-    valid = np.isfinite(C)
-    if not np.any(valid):
-        return 0.0
-    healthy = C[valid] >= threshold
-    return healthy.sum() / healthy.size
-    
-def scan_dx_zip_health(phi, dx_values, threshold=0.5):
-    zhi = []
-    for dx in dx_values:
-        _, _, C = zip_analyzer(phi, dx)
-        zhi.append(zip_health_index(C, threshold))
-    return np.array(zhi)
-    
-# =====================
+# ==================================================
 # STREAMLIT UI
-# =====================
+# ==================================================
 
 st.set_page_config(page_title="ZIP Coherence Analyzer", layout="wide")
 st.title("ZIP Coherence Analyzer")
@@ -126,9 +70,9 @@ st.title("ZIP Coherence Analyzer")
 # ---- SIDEBAR ----
 st.sidebar.header("Vstupní nastavení")
 
-analysis_mode = st.sidebar.radio(
-    "Režim analýzy",
-    ["Statický ZIP", "Časový ZIP"]
+mode = st.sidebar.radio(
+    "Zdroj dat",
+    ["Demo data", "Upload CSV"]
 )
 
 dimension = st.sidebar.radio(
@@ -136,17 +80,16 @@ dimension = st.sidebar.radio(
     ["1D", "2D"]
 )
 
-dx = st.sidebar.slider(
-    "dx (měřítko)",
-    min_value=0.1,
-    max_value=5.0,
-    value=1.0,
-    step=0.05
+analysis_mode = st.sidebar.radio(
+    "Režim analýzy",
+    ["Statický ZIP", "Časový ZIP"]
 )
 
+dx = st.sidebar.slider("dx (měřítko)", 0.1, 5.0, 1.0, 0.05)
+
+# ---- DATA ----
 phi = None
 
-# ---- DATA LOAD ----
 if mode == "Demo data":
     if dimension == "1D":
         x = np.linspace(-10, 10, 300)
@@ -157,13 +100,13 @@ if mode == "Demo data":
         X, Y = np.meshgrid(x, y)
         phi = np.sin(X) * np.cos(Y) * np.exp(-0.05 * (X**2 + Y**2))
 else:
-    uploaded_file = st.sidebar.file_uploader("Nahraj CSV", type=["csv", "txt"])
-    if uploaded_file is not None:
-        phi = np.loadtxt(uploaded_file)
+    f = st.sidebar.file_uploader("CSV", type=["csv", "txt"])
+    if f:
+        phi = np.loadtxt(f)
 
-# =====================
+# ==================================================
 # ANALYZE
-# =====================
+# ==================================================
 
 if st.sidebar.button("Analyze ZIP"):
 
@@ -173,85 +116,27 @@ if st.sidebar.button("Analyze ZIP"):
 
     st.write("DATA SHAPE:", phi.shape)
 
-    # =====================
-    # STATICKÝ ZIP
-    # =====================
+    # -------- STATICKÝ ZIP --------
     if analysis_mode == "Statický ZIP":
 
-        E, I, C = zip_analyzer(phi, dx)
-
         if dimension == "1D":
+            E, I, C = zip_analyzer_1d(phi, dx)
             critical = detect_critical_zones(E, C)
 
             fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
-            ax[0].plot(E)
-            ax[0].set_title("Energie")
-
-            ax[1].plot(I)
-            ax[1].set_title("In-formace")
-
+            ax[0].plot(E); ax[0].set_title("Energie")
+            ax[1].plot(I); ax[1].set_title("In-formace")
             ax[2].plot(C, label="ZIP koherence")
-            idx = np.where(critical)[0]
 
-            if idx.size > 0:
-                ax[2].scatter(
-                    idx,
-                    C[idx],
-                    color="red",
-                    s=20,
-                    zorder=5,
-                    label="kritická zóna"
-                )
+            idx = np.where(critical)[0]
+            if idx.size:
+                ax[2].scatter(idx, C[idx], c="red", s=15, label="kritická zóna")
 
             ax[2].legend()
-            ax[2].set_title("ZIP koherence + kritické zóny")
-
             plt.tight_layout()
             st.pyplot(fig)
 
         else:  # 2D
-            col1, col2, col3 = st.columns(3)
-
-            def show(data, title):
-                fig, ax = plt.subplots()
-                im = ax.imshow(data, origin="lower", cmap="inferno")
-                ax.set_title(title)
-                plt.colorbar(im, ax=ax)
-                st.pyplot(fig)
-
-            with col1:
-                show(E, "Energie")
-            with col2:
-                show(I, "In-formace")
-            with col3:
-                show(C, "ZIP koherence")
-
-    # =====================
-    # ČASOVÝ ZIP (1D)
-    # =====================
-    else:
-        st.subheader("ZIP – časová analýza (demo)")
-
-        phi_time = demo_time_data_1d()
-        T = phi_time.shape[0]
-
-        t = st.slider("Časový krok", 0, T - 2, 0)
-
-        E, I, C_space = zip_analyzer(phi_time[t], dx)
-        C_time = zip_time_coherence(phi_time[t], phi_time[t + 1])
-        C_st = C_space * C_time
-
-        fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
-
-        ax[0].plot(C_space)
-        ax[0].set_title("ZIP – prostorová koherence")
-
-        ax[1].plot(C_time)
-        ax[1].set_title("ZIP – časová koherence")
-
-        ax[2].plot(C_st)
-        ax[2].set_title("ZIP – prostor × čas")
-
-        plt.tight_layout()
-        st.pyplot(fig)
+            E, I, _ = zip_analyzer_2d(phi, dx)
+            C = zip_2d
