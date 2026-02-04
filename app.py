@@ -97,6 +97,17 @@ def demo_time_data_1d(T=30, N=300):
         np.sin(x + 0.2 * t) * np.exp(-0.1 * (x - 0.05 * t) ** 2)
         for t in range(T)
     ])
+def zip_health_index(C, threshold=0.5):
+    """
+    ZIP Health Index (ZHI)
+    Fraction of spatial domain with ZIP coherence above threshold.
+    """
+    C = np.asarray(C)
+    valid = np.isfinite(C)
+    if not np.any(valid):
+        return 0.0
+    healthy = C[valid] >= threshold
+    return healthy.sum() / healthy.size
 
 # =====================
 # STREAMLIT UI
