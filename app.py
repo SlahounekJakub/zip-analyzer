@@ -108,7 +108,14 @@ def zip_health_index(C, threshold=0.5):
         return 0.0
     healthy = C[valid] >= threshold
     return healthy.sum() / healthy.size
-
+    
+def scan_dx_zip_health(phi, dx_values, threshold=0.5):
+    zhi = []
+    for dx in dx_values:
+        _, _, C = zip_analyzer(phi, dx)
+        zhi.append(zip_health_index(C, threshold))
+    return np.array(zhi)
+    
 # =====================
 # STREAMLIT UI
 # =====================
@@ -119,10 +126,23 @@ st.title("ZIP Coherence Analyzer")
 # ---- SIDEBAR ----
 st.sidebar.header("Vstupní nastavení")
 
-mode = st.sidebar.radio("Zdroj dat", ["Demo data", "Upload CSV"])
-dimension = st.sidebar.radio("Dimenze", ["1D", "2D"])
-analysis_mode = st.sidebar.radio("Režim analýzy", ["Statický ZIP", "Časový ZIP"])
-dx = st.sidebar.slider("dx (měřítko)", 0.1, 5.0, 1.0)
+analysis_mode = st.sidebar.radio(
+    "Režim analýzy",
+    ["Statický ZIP", "Časový ZIP"]
+)
+
+dimension = st.sidebar.radio(
+    "Dimenze",
+    ["1D", "2D"]
+)
+
+dx = st.sidebar.slider(
+    "dx (měřítko)",
+    min_value=0.1,
+    max_value=5.0,
+    value=1.0,
+    step=0.05
+)
 
 phi = None
 
