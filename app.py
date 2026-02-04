@@ -268,13 +268,14 @@ if st.sidebar.button("Analyze ZIP"):
 
     st.write("DATA SHAPE:", phi.shape)
 
-    # -----------------
+    # =====================
     # STATICKÝ ZIP
-    # -----------------
+    # =====================
     if analysis_mode == "Statický ZIP":
 
         E, I, C = zip_analyzer(phi, dx)
 
+        # ---------- 1D ----------
         if dimension == "1D":
             critical = detect_critical_zones(E, C)
 
@@ -308,7 +309,8 @@ if st.sidebar.button("Analyze ZIP"):
             plt.tight_layout()
             st.pyplot(fig)
 
-        else:  # 2D
+        # ---------- 2D ----------
+        else:
             col1, col2, col3 = st.columns(3)
 
             def show(data, title):
@@ -325,9 +327,24 @@ if st.sidebar.button("Analyze ZIP"):
             with col3:
                 show(C, "ZIP koherence")
 
-    # -----------------
+        # =====================
+        # ZIP INSIGHT (společné pro 1D i 2D)
+        # =====================
+        zhi = zip_health_index(C, threshold=0.5)
+
+        st.subheader("ZIP Insight")
+        st.metric("ZIP Health Index", f"{zhi:.2f}")
+
+        if zhi >= 0.7:
+            st.success("Systém je převážně koherentní (stabilní stav).")
+        elif zhi >= 0.4:
+            st.warning("Systém je v přechodovém (hraničním) stavu.")
+        else:
+            st.error("Systém vykazuje výraznou ztrátu koherence.")
+
+    # =====================
     # ČASOVÝ ZIP (1D)
-    # -----------------
+    # =====================
     else:
         st.subheader("ZIP – časová analýza")
 
