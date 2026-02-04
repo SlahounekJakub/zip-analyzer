@@ -196,7 +196,7 @@ elif zts >= 0.4:
 else:
     st.error("Systém je časově chaotický / rozpad koherence.")
 
-# ---- grafy (vždy) ----
+# ---- grafy vždy ----
 fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
 ax[0].plot(C_spatial)
@@ -208,5 +208,4 @@ ax[1].set_title("Časová koherence")
 ax[2].plot(C_spacetime)
 ax[2].set_title("Prostor × čas")
 
-plt.tight_layout()
 st.pyplot(fig)
