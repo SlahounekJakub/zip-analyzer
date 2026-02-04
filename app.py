@@ -34,7 +34,13 @@ def zip_analyzer(phi, dx=1.0):
 
     else:
         raise ValueError("Podporována jsou pouze 1D a 2D data.")
-
+        
+def zip_isotropy_index_2d(C):
+    C = np.asarray(C)
+    gy, gx = np.gradient(C)
+    anisotropy = np.abs(gx - gy)
+    return 1.0 - np.mean(anisotropy)
+    
 def detect_critical_zones(E, C, e_thr=0.6, c_thr=0.4):
     E = np.asarray(E)
     C = np.asarray(C)
@@ -126,7 +132,7 @@ if st.sidebar.button("Analyze ZIP"):
 
     st.write("DATA SHAPE:", phi.shape)
 
-    if analysis_mode == "Statický ZIP":
+    if analysis_mode == "Statický ZIP" and dimension == "2D":
 
         E, I, C = zip_analyzer(phi, dx)
 
@@ -158,7 +164,30 @@ if st.sidebar.button("Analyze ZIP"):
             with col1: show(E, "Energie")
             with col2: show(I, "In-formace")
             with col3: show(C, "ZIP koherence")
+                
+zhi = zip_health_index(C)
 
+st.subheader("ZIP Insight – globální koherence")
+st.metric("ZIP Health Index", f"{zhi:.2f}")
+
+if zhi >= 0.7:
+    st.success("Systém je převážně koherentní.")
+elif zhi >= 0.4:
+    st.warning("Systém je v přechodovém stavu.")
+else:
+    st.error("Systém ztrácí koherenci.")
+    
+zii = zip_isotropy_index_2d(C)
+
+st.subheader("ZIP Insight – izotropie (2D)")
+st.metric("ZIP Isotropy Index", f"{zii:.2f}")
+
+if zii >= 0.7:
+    st.success("Systém je izotropně koherentní.")
+elif zii >= 0.4:
+    st.warning("Systém vykazuje směrové nerovnováhy.")
+else:
+    st.error("Systém je silně anizotropní.")
         zhi = zip_health_index(C)
         st.subheader("ZIP Insight")
         st.metric("ZIP Health Index", f"{zhi:.2f}")
