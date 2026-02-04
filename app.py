@@ -61,6 +61,19 @@ def zip_time_coherence(phi_t, phi_t1):
     dphi = phi_t1 - phi_t
     return np.abs(dphi * np.roll(dphi, 1)) / (np.abs(dphi) * np.abs(np.roll(dphi, 1)) + 1e-12)
 
+def zip_temporal_stability(phi_time, dx=1.0):
+    Cs = []
+
+    for t in range(phi_time.shape[0]):
+        _, _, C = zip_analyzer(phi_time[t], dx)
+        Cs.append(C)
+
+    Cs = np.array(Cs)
+    dC = np.abs(Cs[1:] - Cs[:-1])
+    mean_dC = np.mean(dC)
+
+    return 1.0 - mean_dC
+    
 # =====================
 # STREAMLIT UI
 # =====================
@@ -72,7 +85,13 @@ st.sidebar.header("Vstupní nastavení")
 
 data_mode = st.sidebar.radio("Zdroj dat", ["Demo data", "Upload CSV"])
 analysis_mode = st.sidebar.radio("Režim analýzy", ["Statický ZIP", "Časový ZIP"])
-dimension = st.sidebar.radio("Dimenze", ["1D", "2D"])
+
+if analysis_mode == "Časový ZIP":
+    dimension = "1D"
+    st.sidebar.info("Časový ZIP je aktuálně dostupný pouze pro 1D data.")
+else:
+    dimension = st.sidebar.radio("Dimenze", ["1D", "2D"])
+
 dx = st.sidebar.slider("dx (měřítko)", 0.1, 5.0, 1.0, 0.05)
 
 phi = None
