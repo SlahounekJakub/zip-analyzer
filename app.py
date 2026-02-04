@@ -171,11 +171,11 @@ if st.sidebar.button("Analyze ZIP"):
         st.metric("ZIP Health Index", f"{zhi:.2f}")
 
         if zhi >= 0.7:
-    st.success("Systém je převážně koherentní.")
+            st.success("Systém je převážně koherentní.")
         elif zhi >= 0.4:
-    st.warning("Systém je v přechodovém stavu.")
+            st.warning("Systém je v přechodovém stavu.")
         else:
-    st.error("Systém ztrácí koherenci.")
+            st.error("Systém ztrácí koherenci.")
     
 zii = zip_isotropy_index_2d(C)
 
