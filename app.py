@@ -165,16 +165,16 @@ if st.sidebar.button("Analyze ZIP"):
             with col2: show(I, "In-formace")
             with col3: show(C, "ZIP koherence")
                 
-zhi = zip_health_index(C)
+        zhi = zip_health_index(C)
 
-st.subheader("ZIP Insight – globální koherence")
-st.metric("ZIP Health Index", f"{zhi:.2f}")
+        st.subheader("ZIP Insight – globální koherence")
+        st.metric("ZIP Health Index", f"{zhi:.2f}")
 
-if zhi >= 0.7:
+        if zhi >= 0.7:
     st.success("Systém je převážně koherentní.")
-elif zhi >= 0.4:
+        elif zhi >= 0.4:
     st.warning("Systém je v přechodovém stavu.")
-else:
+        else:
     st.error("Systém ztrácí koherenci.")
     
 zii = zip_isotropy_index_2d(C)
