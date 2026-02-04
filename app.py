@@ -121,39 +121,39 @@ if st.sidebar.button("Analyze ZIP"):
     if analysis_mode == "Statický ZIP":
 
         if dimension == "1D":
-            E, I, C = zip_analyzer(phi, dx)
-            critical = detect_critical_zones(E, C)
 
-            fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
-            ax[0].plot(E); ax[0].set_title("Energie")
-            ax[1].plot(I); ax[1].set_title("In-formace")
-            ax[2].plot(C, label="ZIP koherence")
+    E, I, C = zip_analyzer(phi, dx)
+    critical = detect_critical_zones(E, C)
 
-            idx = np.where(critical)[0]
-            if idx.size:
-                ax[2].scatter(idx, C[idx], color="red", s=15, label="kritické zóny")
+    fig, ax = plt.subplots(3, 1, figsize=(8, 6), sharex=True)
 
-            ax[2].legend()
-            plt.tight_layout()
-            st.pyplot(fig)
+    ax[0].plot(E)
+    ax[0].set_title("Energie")
 
-        else:
-            C = zip_2d_isotropic(phi, dx)
-            E = phi**2
-            I = np.sqrt(sum(g**2 for g in np.gradient(phi)))
+    ax[1].plot(I)
+    ax[1].set_title("In-formace")
 
-            col1, col2, col3 = st.columns(3)
-            for col, data, title in zip(
-                [col1, col2, col3],
-                [E, I, C],
-                ["Energie", "In-formace", "ZIP koherence"]
-            ):
-                with col:
-                    fig, ax = plt.subplots()
-                    im = ax.imshow(data, origin="lower", cmap="inferno")
-                    ax.set_title(title)
-                    plt.colorbar(im, ax=ax)
-                    st.pyplot(fig)
+    C1 = np.asarray(C).ravel()
+    crit1 = np.asarray(critical).ravel()
+    idx = np.where(crit1)[0]
+
+    ax[2].plot(C1, label="ZIP koherence")
+
+    if idx.size > 0:
+        ax[2].scatter(
+            idx,
+            C1[idx],
+            color="red",
+            s=15,
+            zorder=5,
+            label="kritické zóny"
+        )
+
+    ax[2].legend()
+    ax[2].set_title("ZIP koherence + kritické zóny")
+
+    plt.tight_layout()
+    st.pyplot(fig)
 
     else:
         phi_t = demo_time_data_1d()
