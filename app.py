@@ -200,4 +200,5 @@ C_spacetime = C_spatial * C_temporal
         ax[0].plot(C_spatial); ax[0].set_title("Prostorová koherence")
 ax[1].plot(C_temporal); ax[1].set_title("Časová koherence")
 ax[2].plot(C_spacetime); ax[2].set_title("Prostor × čas")
+plt.tight_layout()
         st.pyplot(fig)
