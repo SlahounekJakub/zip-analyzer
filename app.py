@@ -177,17 +177,17 @@ if st.sidebar.button("Analyze ZIP"):
         else:
             st.error("Systém ztrácí koherenci.")
     
-zii = zip_isotropy_index_2d(C)
+        zii = zip_isotropy_index_2d(C)
 
-st.subheader("ZIP Insight – izotropie (2D)")
-st.metric("ZIP Isotropy Index", f"{zii:.2f}")
+        st.subheader("ZIP Insight – izotropie (2D)")
+        st.metric("ZIP Isotropy Index", f"{zii:.2f}")
 
-if zii >= 0.7:
-    st.success("Systém je izotropně koherentní.")
-elif zii >= 0.4:
-    st.warning("Systém vykazuje směrové nerovnováhy.")
-else:
-    st.error("Systém je silně anizotropní.")
+        if zii >= 0.7:
+        st.success("Systém je izotropně koherentní.")
+        elif zii >= 0.4:
+        st.warning("Systém vykazuje směrové nerovnováhy.")
+        else:
+        st.error("Systém je silně anizotropní.")
 
 # =====================
 # ZIP – časová analýza
